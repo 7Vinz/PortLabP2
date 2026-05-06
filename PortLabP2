@@ -1,0 +1,209 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+struct Produto {
+    int codigo;
+    char nome[50];
+    float valor;
+    int quantidade;
+};
+
+struct Venda {
+    int codigoProduto;
+    int quantidade;
+};
+
+struct Produto produtos[10];
+struct Venda vendas[10];
+
+int totalProdutos = 0;
+int totalVendas = 0;
+
+void gerarEstoqueAleatorio() {
+    srand(time(NULL));
+    
+    for (int i = 0; i < totalProdutos; i++) {
+        produtos[i].quantidade = rand() % 1000 + 1;
+    }
+}
+
+void cadastrar() {
+    if (totalProdutos >= 10) {
+        printf("Limite de produtos atingido!\n");
+        return;
+    }
+    
+    printf("\nCodigo: ");
+    scanf("%d", &produtos[totalProdutos].codigo);
+    
+    for (int i = 0; i < totalProdutos; i++) {
+        if (produtos[i].codigo == produtos[totalProdutos].codigo) {
+            printf("Codigo ja existe!\n");
+            return;
+        }
+    }
+
+    printf("Nome: ");
+    scanf("%s", produtos[totalProdutos].nome);
+
+    printf("Valor: ");
+    scanf("%f", &produtos[totalProdutos].valor);
+
+    produtos[totalProdutos].quantidade = rand() % 1000 + 1;
+    printf("Estoque gerado automaticamente: %d unidades\n", produtos[totalProdutos].quantidade);
+
+    totalProdutos++;
+    printf("Produto cadastrado com sucesso!\n");
+}
+
+void listar() {
+    if (totalProdutos == 0) {
+        printf("\nNenhum produto cadastrado!\n");
+        return;
+    }
+    
+    printf("\n--- PRODUTOS ---\n");
+    for (int i = 0; i < totalProdutos; i++) {
+        printf("Codigo: %d\n", produtos[i].codigo);
+        printf("Nome: %s\n", produtos[i].nome);
+        printf("Valor: %.2f\n", produtos[i].valor);
+        printf("Estoque: %d\n\n", produtos[i].quantidade);
+    }
+}
+
+void vender() {
+    int codigo, qtd, achou = 0;
+
+    printf("\nCodigo do produto: ");
+    scanf("%d", &codigo);
+
+    for (int i = 0; i < totalProdutos; i++) {
+        if (produtos[i].codigo == codigo) {
+            achou = 1;
+            
+            printf("Produto: %s\n", produtos[i].nome);
+            printf("Estoque atual: %d\n", produtos[i].quantidade);
+            printf("Valor unitario: R$ %.2f\n", produtos[i].valor);
+            printf("Quantidade desejada: ");
+            scanf("%d", &qtd);
+
+            if (produtos[i].quantidade >= qtd && qtd > 0) {
+                float valorTotal = produtos[i].valor * qtd;
+                produtos[i].quantidade -= qtd;
+
+                vendas[totalVendas].codigoProduto = codigo;
+                vendas[totalVendas].quantidade = qtd;
+                totalVendas++;
+
+                printf("Venda realizada!\n");
+                printf("Valor total: R$ %.2f\n", valorTotal);
+                printf("Estoque restante: %d\n", produtos[i].quantidade);
+            } else if (qtd <= 0) {
+                printf("Quantidade invalida!\n");
+            } else {
+                printf("Estoque insuficiente! Estoque atual: %d\n", produtos[i].quantidade);
+            }
+            break;
+        }
+    }
+
+    if (achou == 0) {
+        printf("Produto nao encontrado!\n");
+    }
+}
+
+void listarVendas() {
+    if (totalVendas == 0) {
+        printf("\nNenhuma venda realizada!\n");
+        return;
+    }
+    
+    printf("\n--- VENDAS REALIZADAS ---\n");
+    float totalVendasValor = 0;
+    
+    for (int i = 0; i < totalVendas; i++) {
+        for (int j = 0; j < totalProdutos; j++) {
+            if (produtos[j].codigo == vendas[i].codigoProduto) {
+                float valorVenda = produtos[j].valor * vendas[i].quantidade;
+                printf("Venda %d: %s | Quantidade: %d | Valor: R$ %.2f\n",
+                       i + 1, produtos[j].nome,
+                       vendas[i].quantidade, valorVenda);
+                totalVendasValor += valorVenda;
+                break;
+            }
+        }
+    }
+    
+    printf("\nTOTAL DE VENDAS: R$ %.2f\n", totalVendasValor);
+    printf("Total de itens vendidos: %d\n", totalVendas);
+}
+
+void consultarEstoque() {
+    if (totalProdutos == 0) {
+        printf("\nNenhum produto cadastrado!\n");
+        return;
+    }
+    
+    printf("\n=== CONSULTA DE ESTOQUE ===\n");
+    printf("Produtos com estoque baixo (menos de 10 unidades):\n");
+    int encontrou = 0;
+    
+    for (int i = 0; i < totalProdutos; i++) {
+        if (produtos[i].quantidade < 10) {
+            printf("- %s (Cod: %d): %d unidades\n", 
+                   produtos[i].nome, produtos[i].codigo, produtos[i].quantidade);
+            encontrou = 1;
+        }
+    }
+    
+    if (!encontrou) {
+        printf("Nenhum produto com estoque baixo!\n");
+    }
+}
+
+int main() {
+    int opcao;
+    
+    srand(time(NULL));
+
+    while (1) {
+        printf("\n===== MENU PRINCIPAL =====\n");
+        printf("1 - Cadastrar produto\n");
+        printf("2 - Listar produtos\n");
+        printf("3 - Vender produto\n");
+        printf("4 - Listar vendas\n");
+        printf("5 - Consultar estoque baixo\n");
+        printf("6 - Sair\n");
+        printf("Opcao: ");
+        scanf("%d", &opcao);
+
+        if (opcao == 6) {
+            printf("\nSaindo do sistema...\n");
+            break;
+        }
+
+        switch (opcao) {
+            case 1:
+                cadastrar();
+                break;
+            case 2:
+                listar();
+                break;
+            case 3:
+                vender();
+                break;
+            case 4:
+                listarVendas();
+                break;
+            case 5:
+                consultarEstoque();
+                break;
+            default:
+                printf("Opcao invalida!\n");
+        }
+    }
+
+    return 0;
+}
