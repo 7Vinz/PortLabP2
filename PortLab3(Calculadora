@@ -1,0 +1,144 @@
+#include <stdio.h>
+
+#define MAX 50
+
+/* ===== STRUCT ===== */
+struct Calculo {
+    float num1;
+    float num2;
+    char operacao;
+    float resultado;
+};
+
+struct Calculo historico[MAX];
+int totalCalculos = 0;
+
+/* ===== FUNCOES ===== */
+
+float calcular(float a, float b, char op) {
+    switch (op) {
+        case '+': return a + b;
+        case '-': return a - b;
+        case '*': return a * b;
+        case '/':
+            if (b == 0) {
+                printf("Erro: divisao por zero!\n");
+                return 0;
+            }
+            return a / b;
+        default:
+            printf("Operacao invalida!\n");
+            return 0;
+    }
+}
+
+void realizarCalculo() {
+    if (totalCalculos >= MAX) {
+        printf("Historico cheio!\n");
+        return;
+    }
+
+    float a, b;
+    char op;
+
+    printf("\nPrimeiro numero: ");
+    scanf("%f", &a);
+
+    printf("Operacao (+, -, *, /): ");
+    scanf(" %c", &op);
+
+    printf("Segundo numero: ");
+    scanf("%f", &b);
+
+    float resultado = calcular(a, b, op);
+
+    historico[totalCalculos].num1      = a;
+    historico[totalCalculos].num2      = b;
+    historico[totalCalculos].operacao  = op;
+    historico[totalCalculos].resultado = resultado;
+    totalCalculos++;
+
+    printf("Resultado: %.2f %c %.2f = %.2f\n", a, op, b, resultado);
+}
+
+void listarHistorico() {
+    if (totalCalculos == 0) {
+        printf("Nenhum calculo realizado ainda.\n");
+        return;
+    }
+
+    printf("\n--- Historico ---\n");
+
+    for (int i = 0; i < totalCalculos; i++) {
+        printf("%d. %.2f %c %.2f = %.2f\n",
+               i + 1,
+               historico[i].num1,
+               historico[i].operacao,
+               historico[i].num2,
+               historico[i].resultado);
+    }
+}
+
+void somarResultados() {
+    if (totalCalculos == 0) {
+        printf("Nenhum calculo no historico.\n");
+        return;
+    }
+
+    float soma = 0;
+
+    for (int i = 0; i < totalCalculos; i++) {
+        soma += historico[i].resultado;
+    }
+
+    printf("\nSoma de todos os resultados: %.2f\n", soma);
+    printf("Total de calculos: %d\n", totalCalculos);
+}
+
+void tabuada() {
+    int numero;
+
+    printf("\nDigite o numero: ");
+    scanf("%d", &numero);
+
+    printf("\n--- Tabuada do %d ---\n", numero);
+
+    for (int i = 1; i <= 10; i++) {
+        printf("%d x %d = %d\n", numero, i, numero * i);
+    }
+}
+
+int main() {
+    int opcao;
+
+    printf("=== Calculadora com Historico ===\n");
+
+    while (1) {
+        printf("\n--- Menu ---\n");
+        printf("1. Realizar calculo\n");
+        printf("2. Ver historico\n");
+        printf("3. Somar todos os resultados\n");
+        printf("4. Gerar tabuada\n");
+        printf("0. Sair\n");
+        printf("Opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1: realizarCalculo();
+                break;
+            case 2: listarHistorico();
+                break;
+            case 3: somarResultados();
+                break;
+            case 4: tabuada();
+                break;
+            case 0:
+                printf("Encerrando. Ate logo!\n");
+                return 0;
+            default:
+                printf("Opcao invalida!\n");
+        }
+    }
+
+    return 0;
+}
