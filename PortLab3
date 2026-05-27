@@ -1,1 +1,146 @@
+//Biblioteca
 
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 50
+
+struct Livro {
+    char titulo[100];
+    char autor[100];
+    int ano;
+    int quantidade;
+};
+
+struct Livro biblioteca[MAX];
+int total = 0;
+
+void cadastrarLivro() {
+    if (total >= MAX) {
+        printf("Limite de livros atingido!\n");
+        return;
+    }
+
+    printf("\n--- Cadastrar Livro ---\n");
+
+    printf("Titulo: ");
+    scanf(" %[^\n]", biblioteca[total].titulo);
+
+    printf("Autor: ");
+    scanf(" %[^\n]", biblioteca[total].autor);
+
+    printf("Ano de publicacao: ");
+    scanf("%d", &biblioteca[total].ano);
+
+    printf("Quantidade disponivel: ");
+    scanf("%d", &biblioteca[total].quantidade);
+
+    total++;
+    printf("Livro cadastrado com sucesso!\n");
+}
+
+void listarLivros() {
+    if (total == 0) {
+        printf("Nenhum livro cadastrado.\n");
+        return;
+    }
+
+    printf("\n--- Lista de Livros ---\n");
+
+    for (int i = 0; i < total; i++) {
+        printf("\nLivro %d:\n", i + 1);
+        printf("  Titulo    : %s\n", biblioteca[i].titulo);
+        printf("  Autor     : %s\n", biblioteca[i].autor);
+        printf("  Ano       : %d\n", biblioteca[i].ano);
+        printf("  Quantidade: %d\n", biblioteca[i].quantidade);
+
+        if (biblioteca[i].quantidade > 0) {
+            printf("  Status    : Disponivel\n");
+        } else {
+            printf("  Status    : Indisponivel\n");
+        }
+    }
+}
+
+void verificarDisponibilidade() {
+    char busca[100];
+    int encontrado = 0;
+
+    printf("\nDigite o titulo do livro: ");
+    scanf(" %[^\n]", busca);
+
+    for (int i = 0; i < total; i++) {
+        if (strcmp(biblioteca[i].titulo, busca) == 0) {
+            encontrado = 1;
+
+            if (biblioteca[i].quantidade > 0) {
+                printf("Livro disponivel! Quantidade: %d\n", biblioteca[i].quantidade);
+            } else {
+                printf("Livro indisponivel no momento.\n");
+            }
+        }
+    }
+
+    if (!encontrado) {
+        printf("Livro nao encontrado.\n");
+    }
+}
+
+void buscarPorAno() {
+    int ano;
+    int encontrado = 0;
+
+    printf("\nBuscar livros publicados apos o ano: ");
+    scanf("%d", &ano);
+
+    printf("\n--- Resultados ---\n");
+
+    for (int i = 0; i < total; i++) {
+        if (biblioteca[i].ano > ano) {
+            printf("- %s (%d) - Autor: %s\n",
+                   biblioteca[i].titulo,
+                   biblioteca[i].ano,
+                   biblioteca[i].autor);
+            encontrado = 1;
+        }
+    }
+
+    if (!encontrado) {
+        printf("Nenhum livro encontrado apos o ano %d.\n", ano);
+    }
+}
+
+int main() {
+    int opcao;
+
+    printf("=== Controle de Biblioteca ===\n");
+
+    while (1) {
+        printf("\n--- Menu ---\n");
+        printf("1. Cadastrar livro\n");
+        printf("2. Listar livros\n");
+        printf("3. Verificar disponibilidade\n");
+        printf("4. Buscar livros por ano\n");
+        printf("0. Sair\n");
+        printf("Opcao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1: cadastrarLivro();
+                break;
+            case 2: listarLivros();
+                break;
+            case 3: verificarDisponibilidade();
+                break;
+            case 4: buscarPorAno();
+                break;
+            case 0:
+                printf("Encerrando. Ate logo!\n");
+                return 0;
+            default:
+                printf("Opcao invalida!\n");
+        }
+    }
+
+    return 0;
+}
